@@ -1,0 +1,29 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+body {
+  @apply bg-zinc-900;
+}
+
+@keyframes bubble-up {
+  0% {
+    transform: translateY(0) scale(1) skewX(0deg);
+  }
+  50% {
+    transform: translateY(-4px) scale(1.05) skewX(2deg);
+  }
+  100% {
+    transform: translateY(0) scale(1) skewX(0deg);
+  }
+}
+
+.animate-cell {
+  animation: bubble-up 0.3s ease-in-out;
+}
