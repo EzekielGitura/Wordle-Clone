@@ -16,7 +16,7 @@ A learning project built with React and TypeScript - created for educational pur
 <br>
 
 ![screenshot](Assets/look-like.png)
-![screenshot](Assets/victory.png)
+![screenshot](Assets/Victory.png)
 
 ## Features
 
