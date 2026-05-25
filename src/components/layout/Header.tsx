@@ -9,7 +9,7 @@ const Header = ({ onNewGame }: HeaderProps) => {
   return (
     <header className="game-header px-4 py-3 sm:px-6 flex justify-between items-center">
       <a
-        href="https://azlanibrahim.notion.site/How-to-Play-Wordle-16b4c3b4e0a1800d923bc2f769855e66"
+        href="https://www.notion.so/How-to-Play-the-Wordle-Game-20d58b7c3b2480269a5dfbdc4d8167ba?source=copy_link"
         target="_blank"
         rel="noreferrer"
         className="glass-link text-sm font-medium text-cyan-100 transition hover:text-white"
