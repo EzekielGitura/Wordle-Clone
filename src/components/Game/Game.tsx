@@ -38,17 +38,17 @@ const Game = ({ word, onNewGame }: GameProps) => {
   return (
     <>
       {showGameOver && <GameOver word={word} isOpen={showGameOver} onClose={onNewGame} gameStatus={gameStatus} />}
-      <main className="w-full h-full py-12 lg:py-20">
-        <div className="w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-4">
-          <div className="w-full max-w-[19rem] lg:max-w-md mx-auto grid grid-cols-1 gap-1.5 lg:gap-2">
+      <main className="game-main w-full flex-1 px-4 py-4 sm:px-6 lg:px-8 lg:py-6">
+        <div className="game-stage w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[minmax(22rem,0.9fr)_minmax(30rem,1.1fr)] gap-5 lg:gap-8">
+          <section className="glass-panel board-panel w-full max-w-[21rem] sm:max-w-[24rem] lg:max-w-[31rem] mx-auto grid grid-cols-1 gap-1.5 sm:gap-2">
             {board.map((row, rowIndex) => (
               <Row key={rowIndex} rowIndex={rowIndex} row={row} activeCell={activeCell} />
             ))}
-          </div>
-          <div className="w-full flex flex-col">
+          </section>
+          <section className="glass-panel control-panel w-full flex flex-col">
             <Hero />
             <Keyboard onKeyPress={handleKeyup} keysData={keysData} />
-          </div>
+          </section>
         </div>
       </main>
     </>

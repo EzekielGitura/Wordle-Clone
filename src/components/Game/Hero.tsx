@@ -2,15 +2,9 @@ import WordleLogo from "/Wordle-logo.svg";
 
 const Hero = () => {
   return (
-    <div className="flex-1 hidden lg:flex p-12 justify-center items-center flex-col">
-      <img src={WordleLogo} alt="Logo" className="w-32" />
-      <h2 className="text-2xl font-semibold text-zinc-200">Word Guessing Game - Unlimited</h2>
-      <p className="text-sm text-zinc-400 text-center mt-4 py-3 px-4 border-2 border-dashed rounded-lg border-zinc-700">
-        Make It Better:{" "}
-        <a href="https://github.com/azlibdar/wordle" target="_blank" rel="noopener noreferrer" className="text-sky-400 font-medium">
-          GitHub -&gt;
-        </a>
-      </p>
+    <div className="flex-1 hidden lg:flex min-h-[16rem] p-8 justify-center items-center flex-col gap-5 text-center">
+      <img src={WordleLogo} alt="Logo" className="hero-logo w-36 h-36 object-contain" />
+      <h2 className="max-w-xl text-3xl font-black text-white text-balance">Word Guessing Game - Unlimited</h2>
     </div>
   );
 };

@@ -29,9 +29,9 @@ const App = () => {
         pauseOnHover
         theme="dark"
         stacked
-        toastClassName={"text-sm"}
+        toastClassName={"toast-glass text-sm"}
       />
-      <div className="w-full h-dvh flex flex-col">
+      <div className="game-app w-full min-h-dvh flex flex-col">
         <Header onNewGame={handleStartNewGame} />
         <Game word={word} onNewGame={handleStartNewGame} />
       </div>

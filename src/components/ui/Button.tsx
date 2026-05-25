@@ -10,11 +10,11 @@ interface ButtonProps {
 }
 
 const baseStyles =
-  "transition leading-normal select-none w-min h-min text-nowrap flex justify-center items-center gap-1 active:translate-y-[1px]";
+  "transition leading-normal select-none w-min h-min text-nowrap flex justify-center items-center gap-2 active:translate-y-[1px] outline-none focus-visible:ring-2 focus-visible:ring-cyan-200";
 
 const variants = {
-  primary: "bg-emerald-500 font-medium text-black hover:opacity-95",
-  secondary: "bg-zinc-700 font-medium text-zinc-100 hover:opacity-95",
+  primary: "bg-gradient-to-r from-emerald-300 via-cyan-300 to-sky-400 font-bold text-slate-950 shadow-[0_14px_30px_rgba(34,211,238,0.25)] hover:brightness-110",
+  secondary: "bg-white/10 font-medium text-zinc-100 hover:bg-white/15",
 };
 
 const sizes = {
