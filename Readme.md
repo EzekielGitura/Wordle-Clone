@@ -15,8 +15,8 @@ A learning project built with React and TypeScript - created for educational pur
 
 <br>
 
-![screenshot](https://drive.google.com/file/d/1lgGZYDnGqPfWssYpknfodtVdBm99rOj5/view?usp=sharing)
-![screenshot](https://drive.google.com/file/d/1iVfRFnxbvOow5ECdwV6tmIM2DqF47Sdl/view?usp=sharing)
+![screenshot]([text]https://drive.google.com/file/d/1lgGZYDnGqPfWssYpknfodtVdBm99rOj5/view?usp=sharing)
+![screenshot]([text](https://drive.google.com/file/d/1iVfRFnxbvOow5ECdwV6tmIM2DqF47Sdl/view?usp=sharing))
 
 ## Features
 
