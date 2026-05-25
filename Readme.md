@@ -30,6 +30,19 @@ A learning project built with React and TypeScript - created for educational pur
 
 <br>
 
+## Deployment
+
+This app is configured for Vercel. The production build is generated with Vite and served from the `dist` directory.
+
+- **Framework Preset:** Vite
+- **Install Command:** `npm ci`
+- **Build Command:** `npm run build`
+- **Output Directory:** `dist`
+
+If deploying with the Vercel CLI, use the project name `wordle-clone`.
+
+<br>
+
 ## Contribution
 
 - **Adding new words:** Submit a pull request adding new words to the list or improving existing entries.

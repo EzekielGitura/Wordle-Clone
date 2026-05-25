@@ -14855,3 +14855,7 @@ export const words = [
   "widow",
   "augur",
 ];
+
+const firstSolutionWordIndex = words.indexOf("cigar");
+
+export const solutionWords = firstSolutionWordIndex === -1 ? words : words.slice(firstSolutionWordIndex);

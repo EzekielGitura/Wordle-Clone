@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { decryptWord, handleFormatGuess } from "../helpers";
 import { HistoryState } from "../components/Game/GameOver/History";
-import { KeyInfo, keys } from "../data";
+import { KeyInfo, keys, words } from "../data";
 import { toast } from "react-toastify";
 
 export interface LetterGuess {
@@ -18,17 +18,29 @@ export interface GameStatusType {
 }
 
 const TOTAL_GUESSES = 6;
+const WORD_LENGTH = 5;
+
+const KEY_COLOR_PRIORITY: Record<LetterGuess["color"], number> = {
+  none: 0,
+  gray: 1,
+  yellow: 2,
+  green: 3,
+};
+
+const createEmptyBoard = (): Array<RowGuess> =>
+  Array.from({ length: TOTAL_GUESSES }, () => Array.from({ length: WORD_LENGTH }, () => ({ input: "", color: "none" })));
+
+const createKeyboard = (): KeyInfo[] => keys.map((key) => ({ ...key }));
 
 const useWordle = (word: string) => {
-  const [board, setBoard] = useState<Array<RowGuess>>(
-    Array.from({ length: TOTAL_GUESSES }, () => Array.from({ length: 5 }, () => ({ input: "", color: "none" })))
-  );
+  const validWords = useMemo(() => new Set(words), []);
+  const decryptedWord = useMemo(() => decryptWord(word), [word]);
+  const [board, setBoard] = useState<Array<RowGuess>>(createEmptyBoard);
   const [currentGuess, setCurrentGuess] = useState("");
   const [guessHistory, setGuessHistory] = useState<string[]>([]);
   const [currentTurn, setCurrentTurn] = useState(0);
   const [activeCell, setActiveCell] = useState<[number, number]>([0, 0]);
-  const [isGameOver, setIsGameOver] = useState(false);
-  const [keysData, setKeysData] = useState<KeyInfo[]>(keys);
+  const [keysData, setKeysData] = useState<KeyInfo[]>(createKeyboard);
   const [gameStatus, setGameStatus] = useState<GameStatusType>({
     isOver: false,
     isWinner: false,
@@ -38,7 +50,7 @@ const useWordle = (word: string) => {
   // Save to local storage
   useEffect(() => {
     const history = localStorage.getItem("history");
-    if (!isGameOver) return;
+    if (!gameStatus.isOver) return;
 
     if (history) {
       const parsedHistory: HistoryState = JSON.parse(history);
@@ -59,41 +71,60 @@ const useWordle = (word: string) => {
 
       localStorage.setItem("history", JSON.stringify(initialHistory));
     }
-  }, [isGameOver, gameStatus.isWinner, word]);
+  }, [gameStatus.isOver, gameStatus.isWinner]);
 
-  const handleGuess = (guessRow: RowGuess) => {
-    const decryptedWord = decryptWord(word);
+  const updateKeyboardColors = useCallback((guessRow: RowGuess) => {
+    const bestColorsByLetter = new Map<string, LetterGuess["color"]>();
 
-    setIsGameOver(false);
+    guessRow.forEach(({ input, color }) => {
+      const currentColor = bestColorsByLetter.get(input) ?? "none";
+      if (KEY_COLOR_PRIORITY[color] > KEY_COLOR_PRIORITY[currentColor]) {
+        bestColorsByLetter.set(input, color);
+      }
+    });
+
+    setKeysData((prevKeys) =>
+      prevKeys.map((key) => {
+        const nextColor = bestColorsByLetter.get(key.text);
+        if (!nextColor || key.color === "static" || key.color === "blue") {
+          return key;
+        }
+
+        const currentColor = key.color === "none" ? "none" : key.color;
+        return KEY_COLOR_PRIORITY[nextColor] > KEY_COLOR_PRIORITY[currentColor] ? { ...key, color: nextColor } : key;
+      })
+    );
+  }, []);
+
+  const handleGuess = useCallback((guessRow: RowGuess) => {
+    const didWin = currentGuess === decryptedWord;
+    const didUseLastGuess = currentTurn === TOTAL_GUESSES - 1;
+
     setBoard((prevBoard) => {
       const newBoard = [...prevBoard];
       newBoard[currentTurn] = guessRow;
       return newBoard;
     });
+    setGuessHistory((history) => [...history, currentGuess]);
+    setCurrentGuess("");
 
-    if (currentGuess === decryptedWord) {
-      setGameStatus({ isOver: true, isWinner: true, guessesUsed: currentTurn });
-      setIsGameOver(true);
+    if (didWin || didUseLastGuess) {
+      setGameStatus({ isOver: true, isWinner: didWin, guessesUsed: currentTurn + 1 });
+      setActiveCell([currentTurn, WORD_LENGTH]);
       return;
     }
 
-    if (currentGuess !== decryptedWord && currentTurn === TOTAL_GUESSES - 1) {
-      setGameStatus({ isOver: true, isWinner: false, guessesUsed: currentTurn });
-      setIsGameOver(true);
-    }
-
     setActiveCell([currentTurn + 1, 0]);
-    setGuessHistory((history) => [...history, currentGuess]);
     setCurrentTurn((p) => p + 1);
-    setCurrentGuess("");
-  };
+  }, [currentGuess, currentTurn, decryptedWord]);
 
-  const handleKeyup = (e: string): void => {
-    const decryptedWord = decryptWord(word);
+  const handleKeyup = useCallback((e: string): void => {
+    if (gameStatus.isOver || currentTurn >= TOTAL_GUESSES) return;
+
     const userInput = e.toLowerCase();
 
     if (userInput === "enter") {
-      if (currentGuess.length !== 5) {
+      if (currentGuess.length !== WORD_LENGTH) {
         toast("Please complete a word before submitting");
         return;
       }
@@ -101,58 +132,51 @@ const useWordle = (word: string) => {
         toast("You already guessed that word");
         return;
       }
-      // TODO: Check if the word is valid
+      if (!validWords.has(currentGuess)) {
+        toast("That word is not in the word list");
+        return;
+      }
 
       const formattedGuess = handleFormatGuess(decryptedWord, currentGuess);
 
-      const newKeysData = [...keysData];
-      currentGuess.split("").forEach((letter, index) => {
-        if (![...decryptedWord].includes(letter)) {
-          const index = newKeysData.findIndex((key) => key.text === letter);
-          newKeysData[index].color = "gray";
-          return;
-        }
-        if ([...decryptedWord].includes(letter)) {
-          const index = newKeysData.findIndex((key) => key.text === letter);
-          newKeysData[index].color = "yellow";
-        }
-
-        if ([...decryptedWord][index] === letter) {
-          const index = newKeysData.findIndex((key) => key.text === letter);
-          newKeysData[index].color = "green";
-          return;
-        }
-      });
-
-      setKeysData(newKeysData);
-
-      setActiveCell([currentTurn, currentGuess.length + 1]);
+      updateKeyboardColors(formattedGuess);
+      setActiveCell([currentTurn, currentGuess.length]);
       handleGuess(formattedGuess);
+      return;
     }
 
     if (userInput === "backspace") {
       if (currentGuess.length === 0) return;
+      const previousCellIndex = currentGuess.length - 1;
+
       setCurrentGuess((prev) => prev.slice(0, -1));
       setBoard((prevBoard) => {
-        const newBoard = [...prevBoard];
-        newBoard[currentTurn][currentGuess.length - 1].input = "";
-        return newBoard;
+        return prevBoard.map((row, rowIndex) =>
+          rowIndex === currentTurn
+            ? row.map((cell, cellIndex) => (cellIndex === previousCellIndex ? { ...cell, input: "" } : cell))
+            : row
+        );
       });
-      setActiveCell([currentTurn, currentGuess.length - 1]);
+      setActiveCell([currentTurn, previousCellIndex]);
+      return;
     }
 
     if (/^[a-z]$/.test(userInput)) {
-      if (currentGuess.length < 5) {
+      if (currentGuess.length < WORD_LENGTH) {
+        const nextCellIndex = currentGuess.length;
+
         setCurrentGuess((prev) => prev + userInput);
         setBoard((prevBoard) => {
-          const newBoard = [...prevBoard];
-          newBoard[currentTurn][currentGuess.length].input = userInput;
-          return newBoard;
+          return prevBoard.map((row, rowIndex) =>
+            rowIndex === currentTurn
+              ? row.map((cell, cellIndex) => (cellIndex === nextCellIndex ? { ...cell, input: userInput } : cell))
+              : row
+          );
         });
-        setActiveCell([currentTurn, currentGuess.length + 1]);
+        setActiveCell([currentTurn, nextCellIndex + 1]);
       }
     }
-  };
+  }, [currentGuess, currentTurn, decryptedWord, gameStatus.isOver, guessHistory, handleGuess, updateKeyboardColors, validWords]);
 
   return { board, handleKeyup, keysData, gameStatus, activeCell };
 };

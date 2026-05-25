@@ -1,4 +1,4 @@
-import WordleLogo from "/wordle-logo.svg";
+import WordleLogo from "/Wordle-logo.svg";
 
 const Hero = () => {
   return (

@@ -9,6 +9,8 @@ interface GameStatusProps {
 
 const GameStatus = ({ gameStatus, word }: GameStatusProps) => {
   const decryptedWord = decryptWord(word);
+  const guessLabel = gameStatus.guessesUsed === 1 ? "guess" : "guesses";
+
   return (
     <div className="w-full py-4 pb-8 flex flex-col">
       <h3 className="text-center text-xl font-semibold text-zinc-200">
@@ -16,7 +18,7 @@ const GameStatus = ({ gameStatus, word }: GameStatusProps) => {
       </h3>
       <p className="text-center text-sm max-w-64 lg:max-w-full mx-auto text-zinc-400 mt-0 lg:mt-[2.5px]">
         {gameStatus.isWinner
-          ? `Fantastic job! You nailed it in ${gameStatus.guessesUsed + 1} guesses!`
+          ? `Fantastic job! You nailed it in ${gameStatus.guessesUsed} ${guessLabel}!`
           : "Don't worry, you'll get it next time! The word was:"}
       </p>
       <div className="w-full flex flex-col gap-2">
